@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ຄີບອດ ຊັອບ — ຕົວຊ່ວຍບັນຊີ</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#33475B">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ຄີບອດຊັອບ">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700&family=Noto+Serif+Lao:wght@600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F2EFE9;
+    --surface:#FFFFFF;
+    --ink:#24272B;
+    --ink-soft:#6B6656;
+    --border:#DED7C4;
+    --profit:#3F6B5E;
+    --profit-bg:#E4ECE7;
+    --expense:#A6473A;
+    --expense-bg:#F3E4E0;
+    --navy:#33475B;
+    --navy-bg:#E3E8ED;
+    --key-shadow: 0 3px 0 #D8D0B8, 0 5px 8px rgba(36,39,43,0.10);
+    --key-shadow-press: 0 1px 0 #D8D0B8, 0 1px 3px rgba(36,39,43,0.10);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Noto Sans Lao',sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+  h1,h2,h3,.display{ font-family:'Noto Serif Lao',serif; }
+  .mono{ font-family:'JetBrains Mono',monospace; }
+
+  #app{
+    max-width:520px;
+    margin:0 auto;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    background:var(--bg);
+  }
+
+  header.top{
+    padding:22px 20px 14px;
+    position:sticky;
+    top:0;
+    background:var(--bg);
+    z-index:5;
+    border-bottom:1px solid var(--border);
+  }
+  header.top .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:.12em;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+  }
+  header.top h1{
+    margin:2px 0 0;
+    font-size:22px;
+    font-weight:700;
+  }
+
+  main{
+    flex:1;
+    padding:16px 16px 90px;
+  }
+
+  .tile{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    box-shadow: var(--key-shadow);
+    padding:16px;
+    margin-bottom:14px;
+  }
+
+  .stat-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-bottom:14px;
+  }
+  .stat{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    box-shadow:var(--key-shadow);
+    padding:14px;
+  }
+  .stat.full{ grid-column:1/-1; }
+  .stat .label{
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .stat .value{
+    font-size:20px;
+    font-weight:700;
+  }
+  .stat.profit .value{ color:var(--profit); }
+  .stat.expense .value{ color:var(--expense); }
+  .stat.navy .value{ color:var(--navy); }
+
+  .section-title{
+    font-size:14px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin:20px 0 8px 2px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .section-title .kk{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;
+    background:var(--ink);
+    color:var(--bg);
+    padding:2px 6px;
+    border-radius:4px;
+  }
+
+  form .field{ margin-bottom:12px; }
+  label{
+    display:block;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+  input, select{
+    width:100%;
+    padding:11px 12px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    background:#FBFAF7;
+    font-family:'Noto Sans Lao',sans-serif;
+    font-size:15px;
+    color:var(--ink);
+  }
+  input.mono, .amount-input{ font-family:'JetBrains Mono',monospace; }
+  input:focus, select:focus{
+    outline:2px solid var(--navy);
+    outline-offset:1px;
+    background:#fff;
+  }
+
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+  button.key{
+    font-family:'Noto Serif Lao',serif;
+    font-weight:600;
+    font-size:15px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:12px 16px;
+    background:var(--surface);
+    color:var(--ink);
+    box-shadow:var(--key-shadow);
+    cursor:pointer;
+    transition:transform .04s ease, box-shadow .04s ease;
+  }
+  button.key:active{
+    transform:translateY(3px);
+    box-shadow:var(--key-shadow-press);
+  }
+  button.key.primary{
+    background:var(--navy);
+    color:#fff;
+    border-color:var(--navy);
+  }
+  button.key.danger{
+    background:var(--expense-bg);
+    color:var(--expense);
+    border-color:#E3C6BE;
+  }
+  button.key.full{ width:100%; }
+  button.key.small{
+    padding:6px 10px;
+    font-size:13px;
+    box-shadow:none;
+  }
+
+  .list-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 0;
+    border-bottom:1px solid var(--border);
+    gap:10px;
+  }
+  .list-row:last-child{ border-bottom:none; }
+  .list-row .main{ flex:1; min-width:0; }
+  .list-row .name{ font-weight:600; font-size:14.5px; }
+  .list-row .meta{ font-size:12px; color:var(--ink-soft); margin-top:2px; }
+  .list-row .val{
+    font-family:'JetBrains Mono',monospace;
+    font-weight:700;
+    font-size:14.5px;
+    white-space:nowrap;
+  }
+  .list-row .val.in{ color:var(--profit); }
+  .list-row .val.out{ color:var(--expense); }
+
+  .stock-pill{
+    display:inline-block;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    padding:2px 8px;
+    border-radius:999px;
+    background:var(--navy-bg);
+    color:var(--navy);
+    margin-left:6px;
+  }
+  .stock-pill.low{ background:var(--expense-bg); color:var(--expense); }
+
+  .empty{
+    text-align:center;
+    padding:24px 10px;
+    color:var(--ink-soft);
+    font-size:13.5px;
+  }
+
+  nav.tabbar{
+    position:fixed;
+    bottom:0; left:0; right:0;
+    max-width:520px;
+    margin:0 auto;
+    background:var(--surface);
+    border-top:1px solid var(--border);
+    display:flex;
+    padding:6px 6px calc(6px + env(safe-area-inset-bottom));
+    z-index:10;
+  }
+  nav.tabbar button{
+    flex:1;
+    background:none;
+    border:none;
+    padding:8px 4px;
+    font-family:'Noto Sans Lao',sans-serif;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    cursor:pointer;
+    border-radius:8px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:3px;
+  }
+  nav.tabbar button .ic{ font-size:18px; }
+  nav.tabbar button.active{
+    color:var(--navy);
+    font-weight:600;
+    background:var(--navy-bg);
+  }
+
+  .view{ display:none; }
+  .view.active{ display:block; animation:fadein .18s ease; }
+  @keyframes fadein{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+
+  .toast{
+    position:fixed;
+    bottom:80px; left:50%;
+    transform:translateX(-50%) translateY(10px);
+    background:var(--ink);
+    color:var(--bg);
+    padding:10px 18px;
+    border-radius:8px;
+    font-size:13.5px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s, transform .2s;
+    z-index:20;
+    max-width:80%;
+    text-align:center;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  .loading{ text-align:center; padding:40px; color:var(--ink-soft); font-size:13.5px; }
+
+  .profit-bar-track{
+    width:100%; height:8px; background:var(--border); border-radius:99px; overflow:hidden; margin-top:8px;
+  }
+  .profit-bar-fill{ height:100%; background:var(--profit); border-radius:99px; }
+
+  .badge{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;
+    padding:3px 8px;
+    border-radius:999px;
+    white-space:nowrap;
+    display:inline-block;
+  }
+  .badge.pay-full{ background:var(--profit-bg); color:var(--profit); }
+  .badge.pay-deposit{ background:#F2E9D0; color:#8A6A1F; }
+  .badge.ship-waiting{ background:var(--expense-bg); color:var(--expense); }
+  .badge.ship-packing{ background:#F2E9D0; color:#8A6A1F; }
+  .badge.ship-sent{ background:var(--navy-bg); color:var(--navy); }
+  .badge.ship-done{ background:var(--profit-bg); color:var(--profit); }
+
+  .order-card{
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:12px;
+    margin-bottom:10px;
+    background:#FBFAF7;
+  }
+  .order-card .top-row{
+    display:flex; justify-content:space-between; align-items:flex-start; gap:8px;
+  }
+  .order-card .cname{ font-weight:700; font-size:15px; }
+  .order-card .cphone{ font-size:12px; color:var(--ink-soft); margin-top:1px; }
+  .order-card .oitem{ font-size:13px; color:var(--ink); margin-top:6px; }
+  .order-card .omoney{ font-family:'JetBrains Mono',monospace; font-size:13px; margin-top:4px; color:var(--ink-soft); }
+  .order-card .badges{ display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+  .order-card .actions{ display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
+
+  .install-banner{
+    display:none;
+    align-items:center;
+    gap:10px;
+    background:var(--navy);
+    color:#fff;
+    padding:10px 14px;
+    margin:0 16px 12px;
+    border-radius:10px;
+    font-size:13px;
+  }
+  .install-banner.show{ display:flex; }
+  .install-banner span{ flex:1; }
+  .install-banner button{
+    background:#fff;
+    color:var(--navy);
+    border:none;
+    border-radius:6px;
+    padding:7px 12px;
+    font-family:'Noto Sans Lao',sans-serif;
+    font-weight:600;
+    font-size:12.5px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .install-banner .close{
+    background:none;
+    color:#fff;
+    font-size:16px;
+    padding:0 4px;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div class="eyebrow">SHOP LEDGER · ⌨</div>
+    <h1>ບັນຊີຮ້ານຄີບອດ</h1>
+  </header>
+
+  <div class="install-banner" id="installBanner">
+    <span>📲 ຕິດຕັ້ງແອັບນີ້ໄວ້ໜ້າຈໍມືຖືໄດ້ເລີຍ</span>
+    <button id="installBtn">ຕິດຕັ້ງ</button>
+    <button class="close" id="installClose">✕</button>
+  </div>
+
+  <main id="main">
+    <div class="loading" id="loadingMsg">ກຳລັງໂຫລດຂໍ້ມູນ...</div>
+  </main>
+
+  <nav class="tabbar" id="tabbar" style="display:none">
+    <button data-view="dashboard" class="active"><span class="ic">🏠</span>ສະຫຼຸບ</button>
+    <button data-view="products"><span class="ic">⌨️</span>ສິນຄ້າ</button>
+    <button data-view="orders"><span class="ic">📋</span>ອໍເດີ</button>
+    <button data-view="sale"><span class="ic">💰</span>ບັນທຶກຂາຍ</button>
+    <button data-view="expense"><span class="ic">🧾</span>ລາຍຈ່າຍ</button>
+  </nav>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const S = window.storage;
+let products = [];
+let sales = [];
+let expenses = [];
+let orders = [];
+let ready = false;
+
+const SHIP_STAGES = ['waiting','packing','sent','done'];
+const SHIP_LABEL = {waiting:'ລໍຖ້າສິນຄ້າເຂົ້າ', packing:'ແພັກເຄື່ອງ', sent:'ຈັດສົ່ງແລ້ວ', done:'ເຖິງມືລູກຄ້າແລ້ວ'};
+const SHIP_NEXT_LABEL = {waiting:'→ ແພັກເຄື່ອງ', packing:'→ ຈັດສົ່ງແລ້ວ', sent:'→ ເຖິງມືລູກຄ້າ', done:null};
+
+const THB = n => (isFinite(n)?n:0).toLocaleString('lo-LA', {minimumFractionDigits:0, maximumFractionDigits:0});
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const todayISO = () => new Date().toISOString().slice(0,10);
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+async function loadAll(){
+  try{
+    const [p, s, e, o] = await Promise.all([
+      safeGet('products'), safeGet('sales'), safeGet('expenses'), safeGet('orders')
+    ]);
+    products = p ? JSON.parse(p) : [];
+    sales = s ? JSON.parse(s) : [];
+    expenses = e ? JSON.parse(e) : [];
+    orders = o ? JSON.parse(o) : [];
+  } catch(err){
+    console.error('load error', err);
+    products = []; sales = []; expenses = []; orders = [];
+  }
+  ready = true;
+  document.getElementById('tabbar').style.display = 'flex';
+  render('dashboard');
+}
+
+async function safeGet(key){
+  try{
+    const r = await S.get(key, false);
+    return r ? r.value : null;
+  } catch(e){
+    return null;
+  }
+}
+
+async function persist(key, val){
+  for(let attempt=1; attempt<=2; attempt++){
+    try{
+      await S.set(key, JSON.stringify(val), false);
+      return true;
+    } catch(e){
+      console.error(`save failed (attempt ${attempt})`, e);
+      if(attempt===2){
+        showToast('ບັນທຶກລົ້ມເຫລວ ກະລຸນາລອງໃໝ່ (ຂໍ້ມູນຍັງຄ້າງໃນໜ້ານີ້)');
+        return false;
+      }
+      await new Promise(r=>setTimeout(r, 500));
+    }
+  }
+}
+
+function saveProducts(){ return persist('products', products); }
+function saveSales(){ return persist('sales', sales); }
+function saveExpenses(){ return persist('expenses', expenses); }
+function saveOrders(){ return persist('orders', orders); }
+
+// ---------- calculations ----------
+function totals(){
+  let revenue = 0, cogs = 0;
+  sales.forEach(s=>{
+    revenue += s.sellPrice * s.qty;
+    cogs += (s.costSnapshot + s.shipSnapshot) * s.qty;
+  });
+  const otherExp = expenses.reduce((a,e)=>a+e.amount,0);
+  const profit = revenue - cogs - otherExp;
+  return {revenue, cogs, otherExp, profit};
+}
+
+// ---------- views ----------
+let currentView = 'dashboard';
+
+function render(view){
+  currentView = view;
+  document.querySelectorAll('nav.tabbar button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.view===view);
+  });
+  const main = document.getElementById('main');
+  if(view==='dashboard') main.innerHTML = viewDashboard();
+  if(view==='products') main.innerHTML = viewProducts();
+  if(view==='orders') main.innerHTML = viewOrders();
+  if(view==='sale') main.innerHTML = viewSale();
+  if(view==='expense') main.innerHTML = viewExpense();
+  attachHandlers(view);
+}
+
+function viewDashboard(){
+  const t = totals();
+  const margin = t.revenue>0 ? Math.max(0, Math.min(100, (t.profit/t.revenue)*100)) : 0;
+  const recentSales = [...sales].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
+  const recentExp = [...expenses].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
+
+  return `
+    <div class="stat-grid">
+      <div class="stat"><div class="label">ລາຍຮັບລວມ</div><div class="value mono">₭${THB(t.revenue)}</div></div>
+      <div class="stat"><div class="label">ຕົ້ນທຶນສິນຄ້າທີ່ຂາຍ</div><div class="value mono">₭${THB(t.cogs)}</div></div>
+      <div class="stat expense"><div class="label">ຄ່າໃຊ້ຈ່າຍອື່ນ</div><div class="value mono">₭${THB(t.otherExp)}</div></div>
+      <div class="stat profit"><div class="label">ກຳໄລສຸດທິ</div><div class="value mono">₭${THB(t.profit)}</div></div>
+      <div class="stat navy full">
+        <div class="label">ອັດຕາກຳໄລ (Margin)</div>
+        <div class="value mono">${t.revenue>0 ? margin.toFixed(1) : '0'}%</div>
+        <div class="profit-bar-track"><div class="profit-bar-fill" style="width:${margin}%"></div></div>
+      </div>
+    </div>
+
+    ${orders.filter(o=>o.shipStatus!=='done').length>0 ? `
+    <div class="section-title"><span class="kk">${orders.filter(o=>o.shipStatus!=='done').length}</span>ອໍເດີທີ່ຍັງບໍ່ສຳເລັດ</div>
+    <div class="tile">
+      ${orders.filter(o=>o.shipStatus!=='done').sort((a,b)=>a.date.localeCompare(b.date)).slice(0,4).map(o=>`
+        <div class="list-row">
+          <div class="main">
+            <div class="name">${esc(o.customerName)} · ${esc(o.itemName)}</div>
+            <div class="meta">${o.phone||'-'}</div>
+          </div>
+          <div class="badges" style="display:flex;gap:6px;">
+            <span class="badge ${o.paymentType==='full'?'pay-full':'pay-deposit'}">${o.paymentType==='full'?'ຈ່າຍເຕັມ':'ມັດຈຳ'}</span>
+            <span class="badge ship-${o.shipStatus}">${SHIP_LABEL[o.shipStatus]}</span>
+          </div>
+        </div>
+      `).join('')}
+    </div>` : ''}
+
+    <div class="section-title"><span class="kk">SKU</span>ສະຕັອກຄົງເຫຼືອ</div>
+    <div class="tile">
+      ${products.length===0 ? `<div class="empty">ຍັງບໍ່ມີສິນຄ້າ — ໄປທີ່ແທັບ "ສິນຄ້າ" ເພື່ອເພີ່ມ</div>` :
+        products.map(p=>`
+          <div class="list-row">
+            <div class="main">
+              <div class="name">${esc(p.name)}</div>
+              <div class="meta">ທຶນ ₭${THB(p.costPrice+p.shippingCost)}/ອັນ</div>
+            </div>
+            <div class="val">${p.stock} ອັນ ${p.stock<=2?'<span class="stock-pill low">ໃກ້ໝົດ</span>':''}</div>
+          </div>
+        `).join('')}
+    </div>
+
+    <div class="section-title"><span class="kk">LOG</span>ລາຍການລ່າສຸດ</div>
+    <div class="tile">
+      ${recentSales.length===0 && recentExp.length===0 ? `<div class="empty">ຍັງບໍ່ມີລາຍການ</div>` :
+        [...recentSales.map(s=>({type:'sale', ...s})), ...recentExp.map(e=>({type:'exp', ...e}))]
+        .sort((a,b)=>b.date.localeCompare(a.date)).slice(0,6)
+        .map(r=>{
+          if(r.type==='sale'){
+            const prod = products.find(p=>p.id===r.productId);
+            return `<div class="list-row">
+              <div class="main"><div class="name">ຂາຍ ${esc(prod?prod.name:'ສິນຄ້າ')} x${r.qty}</div><div class="meta">${r.date}</div></div>
+              <div class="val in">+₭${THB(r.sellPrice*r.qty)}</div>
+            </div>`;
+          } else {
+            return `<div class="list-row">
+              <div class="main"><div class="name">${esc(r.desc)}</div><div class="meta">${r.date}</div></div>
+              <div class="val out">−₭${THB(r.amount)}</div>
+            </div>`;
+          }
+        }).join('')
+      }
+    </div>
+  `;
+}
+
+function viewProducts(){
+  return `
+    <div class="section-title"><span class="kk">NEW</span>ເພີ່ມສິນຄ້າໃໝ່</div>
+    <div class="tile">
+      <form id="productForm">
+        <div class="field">
+          <label>ຊື່ສິນຄ້າ</label>
+          <input type="text" id="p_name" placeholder="ເຊັ່ນ: ຄີບອດ 87 ຄີ ສີຂາວ" required>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>ລາຄາຊື້/ອັນ (₭)</label>
+            <input type="number" step="0.01" min="0" class="amount-input" id="p_cost" placeholder="0" required>
+          </div>
+          <div class="field">
+            <label>ຄ່າສົ່ງ/ອັນ (₭)</label>
+            <input type="number" step="0.01" min="0" class="amount-input" id="p_ship" placeholder="0" required>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>ລາຄາຂາຍເລີ່ມຕົ້ນ (₭)</label>
+            <input type="number" step="0.01" min="0" class="amount-input" id="p_sell" placeholder="0">
+          </div>
+          <div class="field">
+            <label>ຈຳນວນຄົງເຫຼືອ</label>
+            <input type="number" min="0" class="amount-input" id="p_stock" placeholder="0" required>
+          </div>
+        </div>
+        <button type="submit" class="key primary full">+ ເພີ່ມສິນຄ້າ</button>
+      </form>
+    </div>
+
+    <div class="section-title"><span class="kk">${products.length}</span>ລາຍການສິນຄ້າ</div>
+    <div class="tile">
+      ${products.length===0 ? `<div class="empty">ຍັງບໍ່ມີສິນຄ້າ ເພີ່ມດ້ານເທິງໄດ້ເລີຍ</div>` :
+        products.map(p=>`
+          <div class="list-row">
+            <div class="main">
+              <div class="name">${esc(p.name)}</div>
+              <div class="meta">ທຶນ ₭${THB(p.costPrice+p.shippingCost)} · ຂາຍ ₭${THB(p.sellPrice||0)} · ເຫຼືອ ${p.stock} ອັນ</div>
+            </div>
+            <div style="display:flex;gap:6px;">
+              <button class="key small" data-restock="${p.id}">+ເຕີມສະຕັອກ</button>
+              <button class="key small danger" data-delprod="${p.id}">ລຶບ</button>
+            </div>
+          </div>
+        `).join('')}
+    </div>
+  `;
+}
+
+function viewOrders(){
+  const sorted = [...orders].sort((a,b)=>{
+    if((a.shipStatus==='done') !== (b.shipStatus==='done')) return a.shipStatus==='done' ? 1 : -1;
+    return b.date.localeCompare(a.date);
+  });
+  return `
+    <div class="section-title"><span class="kk">NEW</span>ບັນທຶກອໍເດີລູກຄ້າ</div>
+    <div class="tile">
+      <form id="orderForm">
+        <div class="row2">
+          <div class="field">
+            <label>ຊື່ລູກຄ້າ</label>
+            <input type="text" id="o_name" placeholder="ເຊັ່ນ: ທ່ານເອ" required>
+          </div>
+          <div class="field">
+            <label>ເບີໂທ</label>
+            <input type="tel" id="o_phone" placeholder="08x-xxx-xxxx">
+          </div>
+        </div>
+        <div class="field">
+          <label>ສິນຄ້າທີ່ສັ່ງ</label>
+          <input type="text" id="o_item" list="productNames" placeholder="ຊື່ຄີບອດ / ລຸ້ນ" required>
+          <datalist id="productNames">
+            ${products.map(p=>`<option value="${esc(p.name)}">`).join('')}
+          </datalist>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>ລາຄາທີ່ຕົກລົງ (₭)</label>
+            <input type="number" step="0.01" min="0" class="amount-input" id="o_price" required>
+          </div>
+          <div class="field">
+            <label>ວັນທີ່ສັ່ງ</label>
+            <input type="date" id="o_date" value="${todayISO()}" required>
+          </div>
+        </div>
+        <div class="field">
+          <label>ການຊຳລະເງິນ</label>
+          <select id="o_paytype">
+            <option value="full">ຈ່າຍເຕັມແລ້ວ</option>
+            <option value="deposit">ມັດຈຳ</option>
+          </select>
+        </div>
+        <div class="field" id="depositField">
+          <label>ຍອດມັດຈຳ (₭)</label>
+          <input type="number" step="0.01" min="0" class="amount-input" id="o_deposit" placeholder="0">
+        </div>
+        <div class="field">
+          <label>ສະຖານະຈັດສົ່ງ</label>
+          <select id="o_ship">
+            <option value="waiting">ລໍຖ້າສິນຄ້າເຂົ້າ</option>
+            <option value="packing">ແພັກເຄື່ອງ</option>
+            <option value="sent">ຈັດສົ່ງແລ້ວ</option>
+            <option value="done">ເຖິງມືລູກຄ້າແລ້ວ</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>ໝາຍເຫດ (ຖ້າມີ)</label>
+          <input type="text" id="o_note" placeholder="ເຊັ່ນ: ສີທີ່ຕ້ອງການ, ທີ່ຢູ່ຈັດສົ່ງ">
+        </div>
+        <button type="submit" class="key primary full">+ ບັນທຶກອໍເດີ</button>
+      </form>
+    </div>
+
+    <div class="section-title"><span class="kk">${orders.length}</span>ລາຍການອໍເດີທັງໝົດ</div>
+    ${sorted.length===0 ? `<div class="tile"><div class="empty">ຍັງບໍ່ມີອໍເດີລູກຄ້າ</div></div>` :
+      sorted.map(o=>{
+        const remaining = o.paymentType==='deposit' ? Math.max(0, o.price - o.deposit) : 0;
+        const nextLabel = SHIP_NEXT_LABEL[o.shipStatus];
+        return `
+        <div class="order-card">
+          <div class="top-row">
+            <div>
+              <div class="cname">${esc(o.customerName)}</div>
+              <div class="cphone">${o.phone ? esc(o.phone) : 'ບໍ່ມີເບີໂທ'}</div>
+            </div>
+            <button class="key small danger" data-delorder="${o.id}">ລຶບ</button>
+          </div>
+          <div class="oitem">🛒 ${esc(o.itemName)}${o.note ? ' · '+esc(o.note) : ''}</div>
+          <div class="omoney">₭${THB(o.price)} ${o.paymentType==='deposit' ? `(ມັດຈຳ ₭${THB(o.deposit)} · ຄ້າງ ₭${THB(remaining)})` : '(ຈ່າຍຄົບແລ້ວ)'}</div>
+          <div class="badges">
+            <span class="badge ${o.paymentType==='full'?'pay-full':'pay-deposit'}">${o.paymentType==='full'?'ຈ່າຍເຕັມ':'ມັດຈຳ'}</span>
+            <span class="badge ship-${o.shipStatus}">${SHIP_LABEL[o.shipStatus]}</span>
+          </div>
+          <div class="actions">
+            ${o.paymentType==='deposit' ? `<button class="key small" data-markpaid="${o.id}">✓ ຈ່າຍຄົບແລ້ວ</button>` : ''}
+            ${nextLabel ? `<button class="key small" data-nextship="${o.id}">${nextLabel}</button>` : ''}
+          </div>
+        </div>
+      `;}).join('')
+    }
+  `;
+}
+
+function viewSale(){
+  if(products.length===0){
+    return `<div class="tile"><div class="empty">ຍັງບໍ່ມີສິນຄ້າໃຫ້ຂາຍ — ໄປເພີ່ມສິນຄ້າທີ່ແທັບ "ສິນຄ້າ" ກ່ອນເດີ</div></div>`;
+  }
+  return `
+    <div class="section-title"><span class="kk">SALE</span>ບັນທຶກການຂາຍ</div>
+    <div class="tile">
+      <form id="saleForm">
+        <div class="field">
+          <label>ສິນຄ້າ</label>
+          <select id="s_product" required>
+            ${products.map(p=>`<option value="${p.id}" data-sell="${p.sellPrice||0}" data-stock="${p.stock}">${esc(p.name)} (ເຫຼືອ ${p.stock})</option>`).join('')}
+          </select>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>ລາຄາຂາຍ/ອັນ (₭)</label>
+            <input type="number" step="0.01" min="0" class="amount-input" id="s_price" required>
+          </div>
+          <div class="field">
+            <label>ຈຳນວນ (ອັນ)</label>
+            <input type="number" min="1" class="amount-input" id="s_qty" value="1" required>
+          </div>
+        </div>
+        <div class="field">
+          <label>ວັນທີ່ຂາຍ</label>
+          <input type="date" id="s_date" value="${todayISO()}" required>
+        </div>
+        <button type="submit" class="key primary full">✓ ບັນທຶກການຂາຍ</button>
+      </form>
+    </div>
+
+    <div class="section-title"><span class="kk">${sales.length}</span>ປະຫວັດການຂາຍ</div>
+    <div class="tile">
+      ${sales.length===0 ? `<div class="empty">ຍັງບໍ່ມີປະຫວັດການຂາຍ</div>` :
+        [...sales].sort((a,b)=>b.date.localeCompare(a.date)).map(s=>{
+          const prod = products.find(p=>p.id===s.productId);
+          return `<div class="list-row">
+            <div class="main"><div class="name">${esc(prod?prod.name:'(ສິນຄ້າຖືກລຶບ)')} x${s.qty}</div><div class="meta">${s.date} · ₭${THB(s.sellPrice)}/ອັນ</div></div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div class="val in">+₭${THB(s.sellPrice*s.qty)}</div>
+              <button class="key small danger" data-delsale="${s.id}">ລຶບ</button>
+            </div>
+          </div>`;
+        }).join('')}
+    </div>
+  `;
+}
+
+function viewExpense(){
+  return `
+    <div class="section-title"><span class="kk">EXP</span>ບັນທຶກຄ່າໃຊ້ຈ່າຍ</div>
+    <div class="tile">
+      <form id="expenseForm">
+        <div class="field">
+          <label>ລາຍການ</label>
+          <input type="text" id="e_desc" placeholder="ເຊັ່ນ: ຄ່າກ່ອງ ຄ່າໂຄສະນາ FB" required>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>ຈຳນວນເງິນ (₭)</label>
+            <input type="number" step="0.01" min="0" class="amount-input" id="e_amount" required>
+          </div>
+          <div class="field">
+            <label>ວັນທີ່</label>
+            <input type="date" id="e_date" value="${todayISO()}" required>
+          </div>
+        </div>
+        <button type="submit" class="key danger full">+ ບັນທຶກຄ່າໃຊ້ຈ່າຍ</button>
+      </form>
+    </div>
+
+    <div class="section-title"><span class="kk">${expenses.length}</span>ປະຫວັດຄ່າໃຊ້ຈ່າຍ</div>
+    <div class="tile">
+      ${expenses.length===0 ? `<div class="empty">ຍັງບໍ່ມີລາຍການຄ່າໃຊ້ຈ່າຍ</div>` :
+        [...expenses].sort((a,b)=>b.date.localeCompare(a.date)).map(e=>`
+          <div class="list-row">
+            <div class="main"><div class="name">${esc(e.desc)}</div><div class="meta">${e.date}</div></div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div class="val out">−₭${THB(e.amount)}</div>
+              <button class="key small danger" data-delexp="${e.id}">ລຶບ</button>
+            </div>
+          </div>
+        `).join('')}
+    </div>
+  `;
+}
+
+function esc(str){
+  return String(str).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+function attachHandlers(view){
+  if(view==='products'){
+    document.getElementById('productForm').addEventListener('submit', async e=>{
+      e.preventDefault();
+      const name = document.getElementById('p_name').value.trim();
+      const cost = parseFloat(document.getElementById('p_cost').value)||0;
+      const ship = parseFloat(document.getElementById('p_ship').value)||0;
+      const sell = parseFloat(document.getElementById('p_sell').value)||0;
+      const stock = parseInt(document.getElementById('p_stock').value)||0;
+      if(!name) return;
+      products.push({id:uid(), name, costPrice:cost, shippingCost:ship, sellPrice:sell, stock});
+      render('products');
+      const ok = await saveProducts();
+      if(ok) showToast('ເພີ່ມສິນຄ້າແລ້ວ');
+    });
+    document.querySelectorAll('[data-restock]').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        const id = btn.dataset.restock;
+        const p = products.find(x=>x.id===id);
+        const qty = prompt(`ເຕີມສະຕັອກ "${p.name}" ຈັກອັນ?`, '1');
+        if(qty===null) return;
+        const n = parseInt(qty);
+        if(!n || n<=0) return;
+        p.stock += n;
+        render('products');
+        const ok = await saveProducts();
+        if(ok) showToast(`ເຕີມສະຕັອກ +${n} ອັນ`);
+      });
+    });
+    document.querySelectorAll('[data-delprod]').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        if(!confirm('ລຶບສິນຄ້ານີ້? (ປະຫວັດການຂາຍເກົ່າຍັງຄົງຢູ່)')) return;
+        products = products.filter(p=>p.id!==btn.dataset.delprod);
+        render('products');
+        await saveProducts();
+      });
+    });
+  }
+
+  if(view==='orders'){
+    const payType = document.getElementById('o_paytype');
+    const depositField = document.getElementById('depositField');
+    const toggleDeposit = ()=>{
+      depositField.style.display = payType.value==='deposit' ? 'block' : 'none';
+    };
+    payType.addEventListener('change', toggleDeposit);
+    toggleDeposit();
+
+    document.getElementById('orderForm').addEventListener('submit', async e=>{
+      e.preventDefault();
+      const customerName = document.getElementById('o_name').value.trim();
+      const phone = document.getElementById('o_phone').value.trim();
+      const itemName = document.getElementById('o_item').value.trim();
+      const price = parseFloat(document.getElementById('o_price').value)||0;
+      const date = document.getElementById('o_date').value || todayISO();
+      const paymentType = document.getElementById('o_paytype').value;
+      let deposit = parseFloat(document.getElementById('o_deposit').value)||0;
+      const shipStatus = document.getElementById('o_ship').value;
+      const note = document.getElementById('o_note').value.trim();
+      if(!customerName || !itemName) return;
+      if(paymentType==='full') deposit = price;
+      orders.push({id:uid(), customerName, phone, itemName, price, date, paymentType, deposit, shipStatus, note});
+      render('orders');
+      const ok = await saveOrders();
+      if(ok) showToast('ບັນທຶກອໍເດີແລ້ວ');
+    });
+
+    document.querySelectorAll('[data-delorder]').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        if(!confirm('ລຶບອໍເດີນີ້?')) return;
+        orders = orders.filter(o=>o.id!==btn.dataset.delorder);
+        render('orders');
+        await saveOrders();
+      });
+    });
+    document.querySelectorAll('[data-markpaid]').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        const o = orders.find(x=>x.id===btn.dataset.markpaid);
+        o.paymentType = 'full';
+        o.deposit = o.price;
+        render('orders');
+        const ok = await saveOrders();
+        if(ok) showToast('ອັບເດດເປັນຈ່າຍຄົບແລ້ວ');
+      });
+    });
+    document.querySelectorAll('[data-nextship]').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        const o = orders.find(x=>x.id===btn.dataset.nextship);
+        const idx = SHIP_STAGES.indexOf(o.shipStatus);
+        if(idx < SHIP_STAGES.length-1) o.shipStatus = SHIP_STAGES[idx+1];
+        render('orders');
+        const ok = await saveOrders();
+        if(ok) showToast(`ສະຖານະ: ${SHIP_LABEL[o.shipStatus]}`);
+      });
+    });
+  }
+
+  if(view==='sale'){
+    const sel = document.getElementById('s_product');
+    const priceInput = document.getElementById('s_price');
+    if(sel){
+      const fillPrice = ()=>{
+        const opt = sel.options[sel.selectedIndex];
+        priceInput.value = opt ? opt.dataset.sell : '';
+      };
+      sel.addEventListener('change', fillPrice);
+      fillPrice();
+    }
+    const form = document.getElementById('saleForm');
+    if(form) form.addEventListener('submit', async e=>{
+      e.preventDefault();
+      const productId = document.getElementById('s_product').value;
+      const sellPrice = parseFloat(document.getElementById('s_price').value)||0;
+      const qty = parseInt(document.getElementById('s_qty').value)||0;
+      const date = document.getElementById('s_date').value || todayISO();
+      const prod = products.find(p=>p.id===productId);
+      if(!prod || qty<=0) return;
+      sales.push({id:uid(), productId, sellPrice, qty, date, costSnapshot:prod.costPrice, shipSnapshot:prod.shippingCost});
+      prod.stock = Math.max(0, prod.stock - qty);
+      render('sale');
+      const [ok1, ok2] = await Promise.all([saveSales(), saveProducts()]);
+      if(ok1 && ok2) showToast('ບັນທຶກການຂາຍແລ້ວ');
+    });
+    document.querySelectorAll('[data-delsale]').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        if(!confirm('ລຶບລາຍການຂາຍນີ້?')) return;
+        sales = sales.filter(s=>s.id!==btn.dataset.delsale);
+        render('sale');
+        await saveSales();
+      });
+    });
+  }
+
+  if(view==='expense'){
+    document.getElementById('expenseForm').addEventListener('submit', async e=>{
+      e.preventDefault();
+      const desc = document.getElementById('e_desc').value.trim();
+      const amount = parseFloat(document.getElementById('e_amount').value)||0;
+      const date = document.getElementById('e_date').value || todayISO();
+      if(!desc || amount<=0) return;
+      expenses.push({id:uid(), desc, amount, date});
+      render('expense');
+      const ok = await saveExpenses();
+      if(ok) showToast('ບັນທຶກຄ່າໃຊ້ຈ່າຍແລ້ວ');
+    });
+    document.querySelectorAll('[data-delexp]').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        if(!confirm('ລຶບລາຍການນີ້?')) return;
+        expenses = expenses.filter(e=>e.id!==btn.dataset.delexp);
+        render('expense');
+        await saveExpenses();
+      });
+    });
+  }
+}
+
+document.getElementById('tabbar').addEventListener('click', e=>{
+  const btn = e.target.closest('button[data-view]');
+  if(btn) render(btn.dataset.view);
+});
+
+// ---------- PWA install ----------
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+
+let deferredInstallPrompt = null;
+const installBanner = document.getElementById('installBanner');
+
+window.addEventListener('beforeinstallprompt', e=>{
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  installBanner.classList.add('show');
+});
+
+document.getElementById('installBtn').addEventListener('click', async ()=>{
+  if(!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  installBanner.classList.remove('show');
+});
+
+document.getElementById('installClose').addEventListener('click', ()=>{
+  installBanner.classList.remove('show');
+});
+
+window.addEventListener('appinstalled', ()=>{
+  installBanner.classList.remove('show');
+});
+
+loadAll();
+</script>
+</body>
+</html>

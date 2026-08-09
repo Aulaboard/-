@@ -1,0 +1,17 @@
+{
+  "name": "ບັນຊີຮ້ານຄີບອດ",
+  "short_name": "ຄີບອດຊັອບ",
+  "description": "ຕົວຊ່ວຍບັນຊີ ລາຍຮັບ-ລາຍຈ່າຍ-ອໍເດີ ສຳລັບຮ້ານຂາຍຄີບອດອອນລາຍ",
+  "start_url": "./keyboard-shop-tracker.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F2EFE9",
+  "theme_color": "#33475B",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
